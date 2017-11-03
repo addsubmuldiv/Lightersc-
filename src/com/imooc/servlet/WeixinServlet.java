@@ -35,17 +35,21 @@ public class WeixinServlet extends HttpServlet {
             String content = map.get("Content");
 
             String message=null;
-            if("text".equals(msgType)) {
-                TextMessage text=new TextMessage();
-                text.setFromUserName(toUserName);
-                text.setToUserName(fromUserName);
-                text.setMsgType("text");
-                text.setCreateTime(LocalDateTime.now().toString());
-                text.setContent("您发送的消息是"+content);
-
-                message=MessageUtil.textMessageToXml(text);
-                System.out.println(message);
+            if(MessageUtil.MESSAGE_TEXT.equals(msgType)) {
+                if("1".equals(content)) {
+                    message=MessageUtil.initText(toUserName,fromUserName,MessageUtil.firstMenu());
+                } else if("2".equals(content)) {
+                    message=MessageUtil.initText(toUserName,fromUserName,MessageUtil.secondMenu());
+                } else if("?".equals(content)||"？".equals(content)) {
+                    message=MessageUtil.initText(toUserName,fromUserName,MessageUtil.menuText());
+                }
+            } else if(MessageUtil.MESSAGE_EVENT.equals(msgType)) {
+                String eventType=map.get("Event");
+                if(MessageUtil.MESSAGE_SUBSCRIBE.equals(eventType)) {
+                    message=MessageUtil.initText(toUserName,fromUserName,MessageUtil.menuText());
+                }
             }
+            System.out.println(message);
             out.print(message);
         } catch (DocumentException e) {
             e.printStackTrace();
